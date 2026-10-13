@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OrderCreated",
+  "type": "object",
+  "properties": {
+    "type": {
+      "const": "OrderCreated"
+    },
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "userId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "itemId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "qty": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "type",
+    "eventId",
+    "orderId",
+    "ts",
+    "userId",
+    "itemId",
+    "qty"
+  ],
+  "additionalProperties": false
+}
