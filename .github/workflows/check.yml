@@ -1,0 +1,30 @@
+name: Architecture checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python scripts/check_structure.py
+      - run: python scripts/test_all.py
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [monolith, hexagonal, microservices, event-driven]
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/docker_check.sh "${{ matrix.architecture }}"
