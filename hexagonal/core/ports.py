@@ -1,0 +1,9 @@
+from typing import Protocol
+from .domain import Order
+
+OrderId = str
+
+class OrderRepository(Protocol):
+    def create(self, order: Order) -> OrderId: ...
+    def get_by_id(self, id: OrderId) -> Order | None: ...
+    def ping(self) -> None: ...

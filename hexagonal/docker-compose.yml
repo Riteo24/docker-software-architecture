@@ -1,0 +1,51 @@
+name: architecture-hexagonal
+services:
+  api:
+    build: .
+    ports:
+    - ${PORT:-8081}:${PORT:-8081}
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-shop}
+      DB_USER: ${DB_USER:-shop}
+      DB_PASS: ${DB_PASS:-shop}
+      PORT: ${PORT:-8081}
+      REPO_ADAPTER: ${REPO_ADAPTER:-db}
+      CSV_PATH: ${CSV_PATH:-/data/orders.csv}
+    volumes:
+    - orders-csv:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import os,urllib.request; urllib.request.urlopen('http://localhost:'+os.environ['PORT']+'/health',
+        timeout=3)
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 30s
+    restart: unless-stopped
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-shop}
+      POSTGRES_USER: ${DB_USER:-shop}
+      POSTGRES_PASSWORD: ${DB_PASS:-shop}
+    volumes:
+    - orders-db:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+volumes:
+  orders-db: {}
+  orders-csv: {}
